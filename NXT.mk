@@ -64,7 +64,7 @@ clear
 fi
 
 # if you set another OUT_DIR,set this before use.
-OUT_DIR=/xpe/out/target/product/$DEVICE
+OUT_DIR=/out/target/product/$DEVICE
 if [ "xpe$OUT_DIR" == "xpe" ]
 then
 echo -e "请设置编译输出路径在该脚本的$VLINE行！"
@@ -87,7 +87,7 @@ echo -e "${bldblu}Setting up environment ${txtrst}"
 export USE_CCACHE=1
 export CCACHE_DIR=~/.ccache
 # set ccache due to your disk space,set it at your own risk
-prebuilts/misc/linux-x86/ccache/ccache -M 15G
+prebuilts/misc/linux-x86/ccache/ccache -M 16G
 . build/envsetup.sh
 
 # lunch device
