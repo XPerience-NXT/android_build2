@@ -51,7 +51,7 @@ except:
     device = product
 
 if not depsonly:
-    print("Device %s not found. Attempting to retrieve device repository from XPerience Github (http://github.com/XPerience-NXT)." % device)
+    print("Device %s not found. Attempting to retrieve device repository from XPerience-NXT Github (http://github.com/XPerience-NXT)." % device)
 
 repositories = []
 
@@ -170,12 +170,12 @@ def add_to_manifest(repositories, fallback_branch = None):
         repo_name = repository['repository']
         repo_target = repository['target_path']
         if exists_in_tree(lm, repo_name):
-            print('XPerience/%s already exists' % (repo_name))
+            print('XPerience-NXT/%s already exists' % (repo_name))
             continue
 
-        print('Adding dependency: XPerience/%s -> %s' % (repo_name, repo_target))
+        print('Adding dependency: XPerience-NXT/%s -> %s' % (repo_name, repo_target))
         project = ElementTree.Element("project", attrib = { "path": repo_target,
-            "remote": "github", "name": "XPerience/%s" % repo_name })
+            "remote": "github", "name": "XPerience-NXT/%s" % repo_name })
 
         if 'branch' in repository:
             project.set('revision',repository['branch'])
@@ -206,7 +206,7 @@ def fetch_dependencies(repo_path, fallback_branch = None):
         fetch_list = []
 
         for dependency in dependencies:
-            if not is_in_manifest("XPerience/%s" % dependency['repository']):
+            if not is_in_manifest("XPerience-NXT/%s" % dependency['repository']):
                 fetch_list.append(dependency)
                 syncable_repos.append(dependency['target_path'])
 
