@@ -1458,6 +1458,7 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	@echo "$(override_device)" > $(PRODUCT_OUT)/ota_override_device
 	@echo "$(BOARD_CUSTOM_BOOTIMG_MK)" > $(PRODUCT_OUT)/ota_custom_bootimg_mk
 	@echo -e ${CL_YLW}"Package OTA:"${CL_RST}" $@"
+	$(hide) APKCERTS=$(APKCERTS_FILE) TARGET_PACK=$(BUILT_TARGET_FILES_PACKAGE) ./build/tools/releasetools/pngcrusher
 	MKBOOTIMG=$(BOARD_CUSTOM_BOOTIMG_MK) \
 	$(OTA_FROM_TARGET_SCRIPT) -v \
 	   -p $(HOST_OUT) \
