@@ -35,7 +35,7 @@ TARGET_ARCH_VARIANT := armv5te
 endif
 
 ifeq ($(strip $(TARGET_GCC_VERSION_EXP)),)
-TARGET_GCC_VERSION := 4.7
+TARGET_GCC_VERSION := 4.8
 else
 TARGET_GCC_VERSION := $(TARGET_GCC_VERSION_EXP)
 endif
@@ -153,7 +153,7 @@ TARGET_GLOBAL_CPPFLAGS += -fvisibility-inlines-hidden
 TARGET_RELEASE_CFLAGS := \
 			-DNDEBUG \
 			-g \
-			-Wstrict-aliasing=2 \
+			-Wstrict-aliasing=3 \
 			-fgcse-after-reload \
 			-frerun-cse-after-loop \
 			-frename-registers
