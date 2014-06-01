@@ -1463,14 +1463,7 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	   -p $(HOST_OUT) \
 	   -k $(KEY_CERT_PAIR) \
 	   --backup=$(backuptool) \
-<<<<<<< HEAD
-	   --override_device=$(override_device) \
-	   --override_prop=$(override_prop) \
-	   $(override_prop) \
-	   $(separate_recovery) \
-=======
 	   --override_device=$(override_device) $(override_prop) \
->>>>>>> parent of 651987c... ota: Allow devices to skip generation of recovery-from-boot.p
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
 CM_TARGET_PACKAGE := $(PRODUCT_OUT)/$(CM_VERSION).zip

@@ -485,12 +485,8 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.Print("Formatting /system")
   script.FormatPartition("/system")
   script.Mount("/system")
-<<<<<<< HEAD
   script.Print("Extracting /system")
 
-  if not OPTIONS.no_separate_recovery:
-=======
->>>>>>> parent of 651987c... ota: Allow devices to skip generation of recovery-from-boot.p
   script.UnpackPackageDir("recovery", "/system")
   script.UnpackPackageDir("system", "/system")
 
