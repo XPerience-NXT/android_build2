@@ -63,10 +63,6 @@ Usage:  ota_from_target_files [flags] input_target_files output_ota_package
       Override build.prop items with custom vendor init.
       Enabled when TARGET_UNIFIED_DEVICE is defined in BoardConfig
 
-  --no_separate_recovery <boolean>
-      Do not generate recovery image. For devices which do not have a truly
-      separate recovery partition.
-
 """
 
 import sys
@@ -106,7 +102,6 @@ OPTIONS.worker_threads = 3
 OPTIONS.backuptool = False
 OPTIONS.override_device = 'auto'
 OPTIONS.override_prop = False
-OPTIONS.no_separate_recovery = False
 
 def MostPopularKey(d, default):
   """Given a dict, return the key corresponding to the largest
@@ -486,24 +481,26 @@ def WriteFullOTAPackage(input_zip, output_zip):
 
   if "selinux_fc" in OPTIONS.info_dict:
     WritePolicyConfig(OPTIONS.info_dict["selinux_fc"], output_zip)
-  script.Print("Formating partitions...");
+
+  script.Print("Formatting /system")
   script.FormatPartition("/system")
   script.Mount("/system")
-  if not OPTIONS.no_separate_recovery:
-    script.UnpackPackageDir("recovery", "/system")
-  script.Print("Unpackig system...");
+
+  script.Print("Extracting /system")
+
+  script.UnpackPackageDir("recovery", "/system")
+
   script.UnpackPackageDir("system", "/system")
-  script.Print("Making Symlinks");
+
   symlinks = CopySystemFiles(input_zip, output_zip)
+  script.Print("Symlinking")
   script.MakeSymlinks(symlinks)
-  script.Print("Wait... :O a fucking rabit in the hole");
-  script.Print("Installing Boot.img...");
+
   boot_img = common.GetBootableImage("boot.img", "boot.img",
                                      OPTIONS.input_tmp, "BOOT")
-  if not OPTIONS.no_separate_recovery:
-    recovery_img = common.GetBootableImage("recovery.img", "recovery.img",
-                                           OPTIONS.input_tmp, "RECOVERY")
-    MakeRecoveryPatch(OPTIONS.input_tmp, output_zip, recovery_img, boot_img)
+  recovery_img = common.GetBootableImage("recovery.img", "recovery.img",
+                                         OPTIONS.input_tmp, "RECOVERY")
+  MakeRecoveryPatch(OPTIONS.input_tmp, output_zip, recovery_img, boot_img)
 
   Item.GetMetadata(input_zip)
   Item.Get("system").SetPermissions(script)
@@ -517,18 +514,16 @@ def WriteFullOTAPackage(input_zip, output_zip):
     script.RunBackup("restore")
 
   script.ShowProgress(0.2, 10)
+  script.Print("Flashing boot.img")
   script.WriteRawImage("/boot", "boot.img")
 
   script.ShowProgress(0.1, 0)
+  script.Print("Enjoy XPerience!");
   device_specific.FullOTA_InstallEnd()
 
   if OPTIONS.extra_script is not None:
     script.AppendExtra(OPTIONS.extra_script)
-  script.Print("Finished!!!");
-  script.Print("Thanks for choose XPerience!");
-  script.Print("From Mexico to the world");
-  script.Print("  ");
-  script.Print("Any bug repor in the post thread with logcat please!");
+
   script.UnmountAll()
   script.AddToZip(input_zip, output_zip)
   WriteMetadata(metadata, output_zip)
@@ -672,12 +667,11 @@ def WriteIncrementalOTAPackage(target_zip, source_zip, output_zip):
       "/tmp/boot.img", "boot.img", OPTIONS.target_tmp, "BOOT")
   updating_boot = (source_boot.data != target_boot.data)
 
-  if not OPTIONS.no_separate_recovery:
-    source_recovery = common.GetBootableImage(
-        "/tmp/recovery.img", "recovery.img", OPTIONS.source_tmp, "RECOVERY",
-        OPTIONS.source_info_dict)
-    target_recovery = common.GetBootableImage(
-        "/tmp/recovery.img", "recovery.img", OPTIONS.target_tmp, "RECOVERY")
+  source_recovery = common.GetBootableImage(
+      "/tmp/recovery.img", "recovery.img", OPTIONS.source_tmp, "RECOVERY",
+      OPTIONS.source_info_dict)
+  target_recovery = common.GetBootableImage(
+      "/tmp/recovery.img", "recovery.img", OPTIONS.target_tmp, "RECOVERY")
   updating_recovery = (source_recovery.data != target_recovery.data)
 
   # Here's how we divide up the progress bar:
@@ -821,7 +815,7 @@ def WriteIncrementalOTAPackage(target_zip, source_zip, output_zip):
     script.Print("Unpacking new files...")
     script.UnpackPackageDir("system", "/system")
 
-  if updating_recovery and not OPTIONS.no_separate_recovery:
+  if updating_recovery:
     script.Print("Unpacking new recovery...")
     script.UnpackPackageDir("recovery", "/system")
 
@@ -897,8 +891,6 @@ def main(argv):
       OPTIONS.override_device = a
     elif o in ("--override_prop"):
       OPTIONS.override_prop = bool(a.lower() == 'true')
-    elif o in ("--no_separate_recovery"):
-      OPTIONS.no_separate_recovery = bool(a.lower() == 'true')
     else:
       return False
     return True
@@ -915,8 +907,7 @@ def main(argv):
                                               "aslr_mode=",
                                               "backup=",
                                               "override_device=",
-                                              "override_prop=",
-                                              "no_separate_recovery="],
+                                              "override_prop="],
                              extra_option_handler=option_handler)
 
   if len(args) != 2:
